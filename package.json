@@ -1,0 +1,38 @@
+{
+  "name": "three-triangle-iterator",
+  "version": "1.0.0",
+  "description": "Make traversal of triangles of three.js's Mesh, BufferGeometry and Geometry object(s) easy",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/prolincur/three-triangle-iterator"
+  },
+  "bugs": {
+    "url": "https://github.com/prolincur/three-triangle-iterator/issues"
+  },
+  "homepage": "https://github.com/prolincur/three-triangle-iterator",
+  "author": {
+    "name": "Sourabh Soni",
+    "email": "Sourabh.Soni@prolincur.com"
+  },
+  "license": "MIT",
+  "private": false,
+  "keywords": [
+    "triangulation",
+    "cad",
+    "viewer",
+    "three",
+    "react-three-fibre",
+    "cross-platform"
+  ],
+  "scripts": {
+    "prettier": "prettier src/**/*.{js,jsx} --write",
+    "lint": "eslint --fix --ext .js,.jsx src"
+  },
+  "peerDependencies": {
+    "three": "^0.123.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.2.1"
+  }
+}

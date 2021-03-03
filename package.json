@@ -1,8 +1,11 @@
 {
   "name": "three-triangle-iterator",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Make traversal of triangles of three.js's Mesh, BufferGeometry and Geometry object(s) easy",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "files": [
+    "lib/*"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/prolincur/three-triangle-iterator"
@@ -25,7 +28,28 @@
     "react-three-fibre",
     "cross-platform"
   ],
+  "babel": {
+    "plugins": [
+      "@babel/plugin-proposal-class-properties"
+    ],
+    "presets": [
+      [
+        "@babel/env",
+        {
+          "targets": {
+            "edge": "17",
+            "firefox": "60",
+            "chrome": "67",
+            "safari": "11.1"
+          },
+          "useBuiltIns": "usage",
+          "corejs": "3.6.5"
+        }
+      ],
+      "minify"    ]
+  },
   "scripts": {
+    "build": "./node_modules/.bin/babel src --out-dir lib",
     "prettier": "prettier src/**/*.{js,jsx} --write",
     "lint": "eslint --fix --ext .js,.jsx src"
   },
@@ -33,6 +57,11 @@
     "three": "^0.123.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.13.0",
+    "@babel/core": "^7.13.8",
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/preset-env": "^7.13.9",
+    "babel-preset-minify": "^0.5.1",
     "prettier": "^2.2.1"
   }
 }

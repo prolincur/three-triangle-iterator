@@ -1,7 +1,7 @@
 
 # three-triangle-iterator
 
-**three-triangle-iterator** is a simple utility which make it easy to iterate over all the triangular geometry faces of a Mesh, Geometry or BufferGeometry objects. This library can work cross platfrom and with your version three.js
+**three-triangle-iterator** is a simple utility which make it easy to iterate over all the triangular geometry faces of a [Mesh](https://threejs.org/docs/#api/en/objects/Mesh), [Geometry](https://threejs.org/docs/#api/en/core/Geometry) or [BufferGeometry](https://threejs.org/docs/#api/en/core/BufferGeometry) objects. It also supports the instanced buffer geometry. This library can work cross platfrom and with your version [three.js](https://threejs.org)
 
 #### Install
 ```

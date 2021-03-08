@@ -7,7 +7,7 @@ import * as THREE from 'three'
 
 /**
  * An utility to make traversal of triangular faces of {@link three.js} Mesh, Geometry or BufferGeometry easy.
- * 
+ *
  * @author Sourabh Soni <Sourabh.Soni@prolincur.com>
  */
 class ThreeTriangleIterator {
@@ -21,7 +21,7 @@ class ThreeTriangleIterator {
     if (object instanceof THREE.Geometry) {
       this.fromGeometry(object)
     } else if (object instanceof THREE.BufferGeometry) {
-      if (object.attributes.position instanceof THREE.InstancedBufferAttribute) {
+      if (object.index !== null) {
         this.fromIndexedBufferGeometry(object)
       } else {
         this.fromNonIndexedBufferGeometry(object)
@@ -71,18 +71,30 @@ class ThreeTriangleIterator {
     if (!this.matrix) this.matrix = new THREE.Matrix4()
     const positions = geometry.attributes.position.array
     const len = positions.length
-
-    for (let i = 0; i < len; i += 9) {
+    if (len % 9 !== 0) throw new Error('Unsupported non-indexed buffer geometry of length ' + len)
+    let i = -1
+    let x, y, z, vertex
+    while (i < len - 1) {
       const polygon = []
-      let vertex = new THREE.Vector3(positions[i], positions[i + 1], positions[i + 2])
+
+      x = positions[++i]
+      y = positions[++i]
+      z = positions[++i]
+      vertex = new THREE.Vector3(x, y, z)
       vertex.applyMatrix4(this.matrix)
       polygon.push(vertex)
 
-      vertex = new THREE.Vector3(positions[i + 3], positions[i + 4], positions[i + 5])
+      x = positions[++i]
+      y = positions[++i]
+      z = positions[++i]
+      vertex = new THREE.Vector3(x, y, z)
       vertex.applyMatrix4(this.matrix)
       polygon.push(vertex)
 
-      vertex = new THREE.Vector3(positions[i + 6], positions[i + 7], positions[i + 8])
+      x = positions[++i]
+      y = positions[++i]
+      z = positions[++i]
+      vertex = new THREE.Vector3(x, y, z)
       vertex.applyMatrix4(this.matrix)
       polygon.push(vertex)
 
@@ -99,30 +111,22 @@ class ThreeTriangleIterator {
     for (let i = 0; i < len; i += 3) {
       const polygon = []
 
-      let index = indices[i]
+      let index3 = indices[i] * 3
       let vertex = new THREE.Vector3(
-        positions[index * 3],
-        positions[index * 3 + 1],
-        positions[index * 3 + 2]
+        positions[index3],
+        positions[index3 + 1],
+        positions[index3 + 2]
       )
       vertex.applyMatrix4(this.matrix)
       polygon.push(vertex)
 
-      index = indices[i + 1]
-      vertex = new THREE.Vector3(
-        positions[index * 3],
-        positions[index * 3 + 1],
-        positions[index * 3 + 2]
-      )
+      index3 = indices[i + 1] * 3
+      vertex = new THREE.Vector3(positions[index3], positions[index3 + 1], positions[index3 + 2])
       vertex.applyMatrix4(this.matrix)
       polygon.push(vertex)
 
-      index = indices[i + 2]
-      vertex = new THREE.Vector3(
-        positions[index * 3],
-        positions[index * 3 + 1],
-        positions[index * 3 + 2]
-      )
+      index3 = indices[i + 2] * 3
+      vertex = new THREE.Vector3(positions[index3], positions[index3 + 1], positions[index3 + 2])
       vertex.applyMatrix4(this.matrix)
       polygon.push(vertex)
 

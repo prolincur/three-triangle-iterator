@@ -1,6 +1,6 @@
 {
   "name": "three-triangle-iterator",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Make traversal of triangles of three.js's Mesh, BufferGeometry and Geometry object(s) easy",
   "main": "lib/index.js",
   "files": [

@@ -1,7 +1,7 @@
 {
   "name": "three-triangle-iterator",
-  "version": "3.0.0",
-  "description": "Make traversal of triangles of three.js's Mesh, BufferGeometry and Geometry object(s) easy",
+  "version": "4.0.0",
+  "description": "Makes it easy to traverse triangles of three.js's Mesh, Group, BufferGeometry and Geometry object(s).",
   "main": "lib/index.js",
   "files": [
     "lib/*"
@@ -25,7 +25,10 @@
     "cad",
     "viewer",
     "three",
-    "react-three-fibre",
+    "3js",
+    "iterator",
+    "triangles",
+    "face",
     "cross-platform"
   ],
   "babel": {

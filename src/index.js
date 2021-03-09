@@ -28,8 +28,11 @@ class ThreeTriangleIterator {
       }
     } else if (object instanceof THREE.Mesh) {
       this.fromMesh(object)
+    } else if (object instanceof THREE.Group) {
+      const traverse = this.iterate
+      object.children?.forEach((obj) => traverse(obj))
     } else {
-      throw new Error('Unsupported object type')
+      console.warn('three-triangle-iterator - skipping unsupported object type ' + object?.type)
     }
   }
 
@@ -71,7 +74,13 @@ class ThreeTriangleIterator {
     if (!this.matrix) this.matrix = new THREE.Matrix4()
     const positions = geometry.attributes.position.array
     const len = positions.length
-    if (len % 9 !== 0) throw new Error('Unsupported non-indexed buffer geometry of length ' + len)
+    if (len % 9 !== 0) {
+      console.warn(
+        'three-triangle-iterator - skipping unsupported non-indexed buffer geometry of length ' +
+          len
+      )
+      return
+    }
     let i = -1
     let x, y, z, vertex
     while (i < len - 1) {

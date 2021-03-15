@@ -40,6 +40,6 @@ forEachTriangle(object, (triangle) => {
 
 ### Author
 
-[Sourabh Soni](mailto:Sourabh.Soni@prolincur.com)\
+[Sourabh Soni](https://prolincur.com)\
 [Prolincur Technologies](https://prolincur.com)
 

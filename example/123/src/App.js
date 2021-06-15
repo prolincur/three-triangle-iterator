@@ -10,7 +10,7 @@ function App() {
   })
   return (
     <div className="App">
-
+      <p>Webgl Convex Geometry Example</p>
     </div>
   );
 }

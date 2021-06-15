@@ -1,12 +1,10 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { ConvexBufferGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { ConvexBufferGeometry } from 'three/examples/jsm/geometries/ConvexGeometry';
 import forEachTriangle from "three-triangle-iterator";
 
 let group, camera, scene, renderer;
 
-init();
-animate();
 
 function init() {
 
@@ -44,7 +42,7 @@ function init() {
     // textures
 
     const loader = new THREE.TextureLoader();
-    const texture = loader.load( 'https://github.com/mrdoob/three.js/tree/r123/examples/textures/sprites/disc.png' );
+    const texture = loader.load( 'https://threejs.org/examples/textures/sprites/disc.png' );
 
     group = new THREE.Group();
     scene.add( group );
@@ -96,19 +94,10 @@ function init() {
     //
     forEachTriangle(mesh1,(triangle)=>{
         triangle.forEach((vertex) => {
-            //... do something with the vertex
-        })
-        // Traverse edges
-        for (let i = 0; i < 3; i++) {
 
-            const iNext = (i + 1) % 3;
-            const edge = {
-                start: triangle[i],
-                end: triangle[iNext],
-            };
-            console.log(edge)
-            //... do something with the edge
-        }
+            console.log(vertex)
+        })
+
     })
     window.addEventListener( 'resize', onWindowResize, false );
 

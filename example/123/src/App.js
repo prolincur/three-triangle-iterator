@@ -7,7 +7,7 @@ function App() {
   useEffect(()=>{
     init();
     animate();
-  })
+  },[])
   return (
     <div className="App">
       <p>Webgl Convex Geometry Example</p>

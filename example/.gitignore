@@ -4,23 +4,20 @@
 /node_modules
 /.pnp
 .pnp.js
-lib
+
 # testing
 /coverage
 
 # production
 /build
-/docs
-/public/testdata
+
 # misc
 .DS_Store
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-.eslintcache
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.cache
-.idea

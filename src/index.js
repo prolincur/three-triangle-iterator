@@ -18,7 +18,12 @@ class ThreeTriangleIterator {
   }
 
   iterate = (object) => {
-    if (object instanceof THREE.Geometry) {
+    const _safeGetGeometry = (three, exp) => {
+      return three[exp]
+    }
+    const Geometry = _safeGetGeometry(THREE, 'Geometry')
+
+    if (Geometry && object instanceof Geometry) {
       this.fromGeometry(object)
     } else if (object instanceof THREE.BufferGeometry) {
       if (object.index !== null) {
@@ -77,7 +82,7 @@ class ThreeTriangleIterator {
     if (len % 9 !== 0) {
       console.warn(
         'three-triangle-iterator - skipping unsupported non-indexed buffer geometry of length ' +
-          len
+        len
       )
       return
     }

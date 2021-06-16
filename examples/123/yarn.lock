@@ -10382,8 +10382,10 @@ text-table@0.2.0, text-table@^0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
 
-"three-triangle-iterator@file:../..":
+three-triangle-iterator@^4.1.1:
   version "4.1.1"
+  resolved "https://registry.yarnpkg.com/three-triangle-iterator/-/three-triangle-iterator-4.1.1.tgz#875c7c946e5c3db21c68aab048fdadbfa818320b"
+  integrity sha512-VC5BycnTJN1kbzt5ACI/uSpuVeqDecqPGKGlAqtprWeMKPyrtV9Git0L8DA7Zyw4odlhZNSVyxTyER+LxuGkfQ==
 
 three@^0.123.0:
   version "0.123.0"

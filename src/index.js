@@ -6,6 +6,14 @@
 import * as THREE from 'three'
 
 /**
+ * Simple trick to load THREE.Geometry in older and newer versions of three
+ * @returns
+ */
+const _safeGetExport = (three, exp) => {
+  return three[exp]
+}
+
+/**
  * An utility to make traversal of triangular faces of {@link three.js} Mesh, Geometry or BufferGeometry easy.
  *
  * @author Sourabh Soni <Sourabh.Soni@prolincur.com>
@@ -18,11 +26,7 @@ class ThreeTriangleIterator {
   }
 
   iterate = (object) => {
-    const _safeGetGeometry = (three, exp) => {
-      return three[exp]
-    }
-    const Geometry = _safeGetGeometry(THREE, 'Geometry')
-
+    const Geometry = _safeGetExport(THREE, 'Geometry')
     if (Geometry && object instanceof Geometry) {
       this.fromGeometry(object)
     } else if (object instanceof THREE.BufferGeometry) {

@@ -1,5 +1,3 @@
-import logo from './logo.svg'
-import './App.css'
 import { useEffect } from 'react'
 import { init, animate } from './webgl_geometry_convex'
 

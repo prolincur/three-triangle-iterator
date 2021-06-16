@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { ConvexBufferGeometry } from 'three/examples/jsm/geometries/ConvexGeometry'
-import forEachTriangle from './temp'
+import forEachTriangle from 'three-triangle-iterator'
 
 let group, camera, scene, renderer
 
@@ -86,7 +86,7 @@ function init() {
   group.add(mesh2)
 
   //
-  forEachTriangle(pointsGeometry, (triangle) => {
+  forEachTriangle(mesh2, (triangle) => {
     triangle.forEach((vertex) => {
       console.log(vertex)
     })

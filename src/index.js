@@ -82,7 +82,7 @@ class ThreeTriangleIterator {
     if (len % 9 !== 0) {
       console.warn(
         'three-triangle-iterator - skipping unsupported non-indexed buffer geometry of length ' +
-        len
+          len
       )
       return
     }

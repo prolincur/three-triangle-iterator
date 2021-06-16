@@ -1,7 +1,8 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { ConvexBufferGeometry } from 'three/examples/jsm/geometries/ConvexGeometry';
-import forEachTriangle from "./temp";
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
+import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import forEachTriangle from './temp'
 
 let group, camera, scene, renderer;
 
@@ -28,9 +29,11 @@ function init() {
     controls.maxDistance = 50;
     controls.maxPolarAngle = Math.PI / 2;
 
+    // ambient light
+
     scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-    // light
+    // point light
 
     const light = new THREE.PointLight( 0xffffff, 1 );
     camera.add( light );
@@ -42,18 +45,30 @@ function init() {
     // textures
 
     const loader = new THREE.TextureLoader();
-    const texture = loader.load( 'https://threejs.org/examples/textures/sprites/disc.png' );
+    const texture = loader.load( 'https://cdn.rawgit.com/mrdoob/three.js/r129/examples/textures/sprites/disc.png' );
 
     group = new THREE.Group();
     scene.add( group );
 
     // points
 
-    const vertices = new THREE.DodecahedronGeometry( 10 ).vertices;
+    let dodecahedronGeometry = new THREE.DodecahedronGeometry( 10 );
 
-    for ( let i = 0; i < vertices.length; i ++ ) {
+    // if normal and uv attributes are not removed, mergeVertices() can't consolidate indentical vertices with different normal/uv data
 
-        //vertices[ i ].add( randomPoint().multiplyScalar( 2 ) ); // wiggle the points
+    dodecahedronGeometry.deleteAttribute( 'normal' );
+    dodecahedronGeometry.deleteAttribute( 'uv' );
+
+    dodecahedronGeometry = BufferGeometryUtils.mergeVertices( dodecahedronGeometry );
+
+    const vertices = [];
+    const positionAttribute = dodecahedronGeometry.getAttribute( 'position' );
+
+    for ( let i = 0; i < positionAttribute.count; i ++ ) {
+
+        const vertex = new THREE.Vector3();
+        vertex.fromBufferAttribute( positionAttribute, i );
+        vertices.push( vertex );
 
     }
 
@@ -79,7 +94,7 @@ function init() {
         transparent: true
     } );
 
-    const meshGeometry = new ConvexBufferGeometry( vertices );
+    const meshGeometry = new ConvexGeometry( vertices );
 
     const mesh1 = new THREE.Mesh( meshGeometry, meshMaterial );
     mesh1.material.side = THREE.BackSide; // back faces
@@ -91,15 +106,14 @@ function init() {
     mesh2.renderOrder = 1;
     group.add( mesh2 );
 
-    //
-    forEachTriangle(pointsGeometry,(triangle)=>{
+    /*Calling forEachTriangle method and printing vertex in console*/
+    forEachTriangle(mesh2,(triangle)=>{
         triangle.forEach((vertex) => {
-
             console.log(vertex)
         })
 
     })
-    window.addEventListener( 'resize', onWindowResize, false );
+    window.addEventListener( 'resize', onWindowResize );
 
 }
 

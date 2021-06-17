@@ -1,14 +1,12 @@
-import { useEffect } from 'react'
-import { init, animate } from './webgl_geometry_convex'
+import { WebglGeometryConvex } from './WebglGeometryConvex'
+import { Canvas } from '@react-three/fiber'
 
 function App() {
-  useEffect(() => {
-    init()
-    animate()
-  }, [])
   return (
     <div className="App">
-      <p>Webgl Convex Geometry Example</p>
+      <Canvas>
+        <WebglGeometryConvex />
+      </Canvas>
     </div>
   )
 }

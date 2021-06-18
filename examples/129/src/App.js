@@ -1,10 +1,18 @@
 import React from 'react'
 import { WebglGeometryConvex } from './WebglGeometryConvex'
-import { Canvas, useFrame } from '@react-three/fiber'
-
+import { Canvas } from '@react-three/fiber'
+import './App.css'
 function App() {
+  const style = {
+    width: '100%',
+    height: '100%',
+    background: 0,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  }
   return (
-    <div className="App">
+    <div className="App" style={style}>
       <Canvas
         camera={{
           fov: 40,

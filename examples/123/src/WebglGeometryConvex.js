@@ -4,9 +4,13 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { TextureLoader } from 'three/src/loaders/TextureLoader'
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry'
 import * as THREE from 'three'
+import forEachTriangle from 'three-triangle-iterator'
 extend({ OrbitControls, ConvexGeometry })
 
 const WebglConvexGeometry = () => {
+  const pointsRef = React.useRef()
+  const meshRef = React.useRef()
+
   const {
     camera,
     gl: { domElement },
@@ -18,13 +22,22 @@ const WebglConvexGeometry = () => {
     const vertices = new THREE.DodecahedronGeometry(10).vertices
     return vertices
   }, [])
-  const pointsRef = React.useRef()
+
   useEffect(() => {
     if (pointsRef.current) {
       pointsRef.current.setFromPoints(vertices)
     }
   }, [vertices])
 
+  useEffect(() => {
+    if (meshRef.current) {
+      forEachTriangle(meshRef.current, (triangle) => {
+        triangle.forEach((vertex) => {
+          console.log(vertex)
+        })
+      })
+    }
+  }, [])
   return (
     <React.Fragment>
       <orbitControls
@@ -51,7 +64,7 @@ const WebglConvexGeometry = () => {
           <bufferGeometry ref={pointsRef} />
         </points>
 
-        <mesh renderOrder={0}>
+        <mesh ref={meshRef} renderOrder={0}>
           <convexGeometry args={[vertices]} />
           <meshLambertMaterial
             args={[

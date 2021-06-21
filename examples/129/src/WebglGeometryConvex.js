@@ -1,13 +1,16 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { extend, useThree, useLoader } from '@react-three/fiber'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { TextureLoader } from 'three/src/loaders/TextureLoader'
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry'
 import * as THREE from 'three'
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils'
+import forEachTriangle from 'three-triangle-iterator'
 extend({ OrbitControls, ConvexGeometry })
 
 const WebglGeometryConvex = () => {
+  const pointsRef = React.useRef()
+  const meshRef = React.useRef()
   const {
     camera,
     gl: { domElement },
@@ -30,12 +33,21 @@ const WebglGeometryConvex = () => {
     return vertices
   }, [])
 
-  const pointsRef = React.useRef()
   React.useEffect(() => {
     if (pointsRef.current) {
       pointsRef.current.setFromPoints(vertices)
     }
   }, [vertices])
+
+  useEffect(() => {
+    if (meshRef.current) {
+      forEachTriangle(meshRef.current, (triangle) => {
+        triangle.forEach((vertex) => {
+          console.log(vertex)
+        })
+      })
+    }
+  }, [])
   return (
     <React.Fragment>
       <orbitControls
@@ -74,7 +86,7 @@ const WebglGeometryConvex = () => {
             side={THREE.BackSide}
           />
         </mesh>
-        <mesh rednderOrder={1}>
+        <mesh ref={meshRef} rednderOrder={1}>
           <convexGeometry args={[vertices]} />
           <meshLambertMaterial
             args={[

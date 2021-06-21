@@ -9,7 +9,7 @@ extend({ OrbitControls, ConvexGeometry })
 
 const WebglConvexGeometry = () => {
   const pointsRef = React.useRef()
-  const meshRef = React.useRef()
+  const meshFrontRef = React.useRef()
 
   const {
     camera,
@@ -30,12 +30,32 @@ const WebglConvexGeometry = () => {
   }, [vertices])
 
   useEffect(() => {
-    if (meshRef.current) {
-      forEachTriangle(meshRef.current, (triangle) => {
+    if (meshFrontRef.current) {
+      const colors =[];
+      forEachTriangle(meshFrontRef.current, (triangle) => {
         triangle.forEach((vertex) => {
           console.log(vertex)
+          const hex= '#'+(Math.random() * 0x9B270F << 0).toString(16).padStart(6, '0');
+          const color = new THREE.Color()
+          color.set(hex)
+          colors.push(color.r,color.g,color.b)
+
         })
       })
+      meshFrontRef.current.geometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(colors),3))
+    }
+    if(meshBackRef.current){
+      const colors =[];
+      forEachTriangle(meshBackRef.current, (triangle) => {
+        triangle.forEach((vertex) => {
+          const hex= '#'+(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0');
+          const color = new THREE.Color()
+          color.set(hex)
+          colors.push(color.r,color.g,color.b)
+
+        })
+      })
+      meshFrontRef.current.geometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(colors),3))
     }
   }, [])
   return (
@@ -64,7 +84,7 @@ const WebglConvexGeometry = () => {
           <bufferGeometry ref={pointsRef} />
         </points>
 
-        <mesh ref={meshRef} renderOrder={0}>
+        <mesh ref={meshFrontRef} renderOrder={0}>
           <convexGeometry args={[vertices]} />
           <meshLambertMaterial
             args={[
@@ -75,9 +95,10 @@ const WebglConvexGeometry = () => {
               },
             ]}
             side={THREE.BackSide}
+            vertextColors={THREE.VertexColors}
           />
         </mesh>
-        <mesh rednderOrder={1}>
+        <mesh ref={meshBackRef} rednderOrder={1}>
           <convexGeometry args={[vertices]} />
           <meshLambertMaterial
             args={[
@@ -88,6 +109,7 @@ const WebglConvexGeometry = () => {
               },
             ]}
             side={THREE.FrontSide}
+            vertexColors={THREE.VertexColors}
           />
         </mesh>
       </group>

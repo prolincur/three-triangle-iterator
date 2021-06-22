@@ -42,31 +42,62 @@ const WebglGeometryConvex = () => {
 
   useEffect(() => {
     if (meshFrontRef.current) {
-      const colors =[];
+      const colors = []
       forEachTriangle(meshFrontRef.current, (triangle) => {
         triangle.forEach((vertex) => {
-          console.log(vertex)
-          const hex= '#'+(Math.random() * 0x9B270F << 0).toString(16).padStart(6, '0');
-          const color = new THREE.Color()
-          color.set(hex)
-          colors.push(color.r,color.g,color.b)
+          let letters = '0123456789ABCDEF'
 
+          let hexR = '#'
+          for (let i = 0; i < 6; i++) {
+            hexR += letters[Math.floor(Math.random() * 16)]
+          }
+          let hexG = '#'
+          for (let i = 0; i < 6; i++) {
+            hexG += letters[Math.floor(Math.random() * 16)]
+          }
+          let hexB = '#'
+          for (let i = 0; i < 6; i++) {
+            hexB += letters[Math.floor(Math.random() * 16)]
+          }
+
+          const color = new THREE.Color()
+          color.setRGB(hexR, hexG, hexB)
+          color.set(hexB)
+          colors.push(color.r, color.g, color.b)
         })
       })
-      meshFrontRef.current.geometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(colors),3))
+      meshFrontRef.current.geometry.setAttribute(
+        'color',
+        new THREE.Float32BufferAttribute(colors, 3)
+      )
     }
-    if(meshBackRef.current){
-      const colors =[];
+    if (meshBackRef.current) {
+      const colors = []
+      let letters = '0123456789ABCDEF'
       forEachTriangle(meshBackRef.current, (triangle) => {
         triangle.forEach((vertex) => {
-          const hex= '#'+(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0');
+          let hexR = '#'
+          for (let i = 0; i < 6; i++) {
+            hexR += letters[Math.floor(Math.random() * 16)]
+          }
+          let hexG = '#'
+          for (let i = 0; i < 6; i++) {
+            hexG += letters[Math.floor(Math.random() * 16)]
+          }
+          let hexB = '#'
+          for (let i = 0; i < 6; i++) {
+            hexB += letters[Math.floor(Math.random() * 16)]
+          }
           const color = new THREE.Color()
-          color.set(hex)
-          colors.push(color.r,color.g,color.b)
-
+          color.setRGB(hexR, hexG, hexB)
+          color.set(hexB)
+          colors.push(color.r, color.g, color.b)
         })
       })
-      meshFrontRef.current.geometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(colors),3))
+      meshBackRef.current.geometry.setAttribute(
+        'color',
+        new THREE.Float32BufferAttribute(colors, 3, true)
+      )
     }
   }, [])
   return (

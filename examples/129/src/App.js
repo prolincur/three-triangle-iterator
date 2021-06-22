@@ -13,6 +13,7 @@ function App() {
   }
   return (
     <div className="App" style={style}>
+      <p>Webgl Convex Geometry Exammple using React Three Fiber</p>
       <Canvas
         camera={{
           fov: 40,

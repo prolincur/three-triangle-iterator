@@ -2,14 +2,17 @@ import React, { useEffect } from 'react'
 import { extend, useThree, useLoader } from '@react-three/fiber'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { TextureLoader } from 'three/src/loaders/TextureLoader'
-import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry'
+import { ConvexBufferGeometry } from 'three/examples/jsm/geometries/ConvexGeometry'
 import * as THREE from 'three'
 import forEachTriangle from 'three-triangle-iterator'
-extend({ OrbitControls, ConvexGeometry })
+import { generateRandomColors } from './Common/ColorUtils'
+
+extend({ OrbitControls, ConvexBufferGeometry })
 
 const WebglConvexGeometry = () => {
   const pointsRef = React.useRef()
   const meshFrontRef = React.useRef()
+  const meshBackRef = React.useRef()
 
   const {
     camera,
@@ -22,7 +25,29 @@ const WebglConvexGeometry = () => {
     const vertices = new THREE.DodecahedronGeometry(10).vertices
     return vertices
   }, [])
-
+  const setAttribute = (mesh, name, value, itemSize) => {
+    if (!mesh) return
+    if (!Array.isArray(value)) return
+    const geometry = mesh.geometry
+    if (!geometry) return
+    if (geometry instanceof THREE.Geometry) {
+      if (name === 'color') {
+        geometry.colors = value;
+        geometry.colorsNeedUpdate=true
+      } else {
+        throw new Error('unsupported attribute')
+      }
+    } else if (geometry instanceof THREE.BufferGeometry) {
+      if(name==='color'){
+        const rgb =[];
+        value.forEach((v)=>{
+          rgb.push(v[0],v[1],v[2])
+        })
+        value=rgb
+      }
+      geometry.setAttribute(name, new THREE.Float32BufferAttribute(value, itemSize))
+    }
+  }
   useEffect(() => {
     if (pointsRef.current) {
       pointsRef.current.setFromPoints(vertices)
@@ -31,31 +56,22 @@ const WebglConvexGeometry = () => {
 
   useEffect(() => {
     if (meshFrontRef.current) {
-      const colors =[];
+      const colors = []
       forEachTriangle(meshFrontRef.current, (triangle) => {
         triangle.forEach((vertex) => {
-          console.log(vertex)
-          const hex= '#'+(Math.random() * 0x9B270F << 0).toString(16).padStart(6, '0');
-          const color = new THREE.Color()
-          color.set(hex)
-          colors.push(color.r,color.g,color.b)
-
+          colors.push(generateRandomColors());
         })
       })
-      meshFrontRef.current.geometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(colors),3))
+      setAttribute(meshFrontRef.current, 'color', colors, 3)
     }
-    if(meshBackRef.current){
-      const colors =[];
+    if (meshBackRef.current) {
+      const colors = []
       forEachTriangle(meshBackRef.current, (triangle) => {
         triangle.forEach((vertex) => {
-          const hex= '#'+(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0');
-          const color = new THREE.Color()
-          color.set(hex)
-          colors.push(color.r,color.g,color.b)
-
+          colors.push(generateRandomColors());
         })
       })
-      meshFrontRef.current.geometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(colors),3))
+      setAttribute(meshBackRef.current, 'color', colors, 3)
     }
   }, [])
   return (
@@ -66,7 +82,7 @@ const WebglConvexGeometry = () => {
         maxDistance={50}
         maxPolarAngle={Math.PI / 2}
       />
-      <ambientLight args={[0x222222]} intensity={0.1} />
+      <ambientLight args={[0xffffff]} intensity={0.1} />
       <pointLight args={[0xffffff, 1]} />
       <axesHelper args={[20]} />
       <group>
@@ -85,11 +101,11 @@ const WebglConvexGeometry = () => {
         </points>
 
         <mesh ref={meshFrontRef} renderOrder={0}>
-          <convexGeometry args={[vertices]} />
+          <convexBufferGeometry args={[vertices]} />
           <meshLambertMaterial
             args={[
               {
-                color: 0xffffff,
+                //color: 0xffffff,
                 opacity: 0.5,
                 transparent: true,
               },
@@ -99,11 +115,11 @@ const WebglConvexGeometry = () => {
           />
         </mesh>
         <mesh ref={meshBackRef} rednderOrder={1}>
-          <convexGeometry args={[vertices]} />
+          <convexBufferGeometry args={[vertices]} />
           <meshLambertMaterial
             args={[
               {
-                color: 0xffffff,
+                //color: 0xffffff,
                 opacity: 0.5,
                 transparent: true,
               },

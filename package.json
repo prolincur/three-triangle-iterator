@@ -57,7 +57,7 @@
     "lint": "eslint --fix --ext .js,.jsx src"
   },
   "peerDependencies": {
-    "three": "^0.148.0"
+    "three": ">= 0.148.0 <= 0.157.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.0",

@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { TextureLoader } from 'three/src/loaders/TextureLoader'
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry'
 import * as THREE from 'three'
-import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils'
+import * as  BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
 import forEachTriangle from 'three-triangle-iterator';
 import {generateRandomColors} from './Common/ColorUtils'
 
@@ -27,7 +27,7 @@ const WebglGeometryConvex = () => {
     const positionAttribute = dodecahedronGeometry.getAttribute('position')
     dodecahedronGeometry.deleteAttribute('normal')
     dodecahedronGeometry.deleteAttribute('uv')
-    dodecahedronGeometry = mergeVertices(dodecahedronGeometry)
+    dodecahedronGeometry = BufferGeometryUtils.mergeVertices(dodecahedronGeometry)
     for (let i = 0; i < positionAttribute.count; i++) {
       const vertex = new THREE.Vector3()
       vertex.fromBufferAttribute(positionAttribute, i)
@@ -79,20 +79,6 @@ const WebglGeometryConvex = () => {
     }
   }, [])
 
-  const vertexColor = React.useMemo(
-    () => ([ 
-      new THREE.Color( "rgba(255,255,255, 1)"), 
-              new THREE.Color( "rgb(255,255,255)" ), 
-                new THREE.Color( "rgb(255,255,255)" ), 
-                  new THREE.Color( "rgb(255,255,255)" ),
-                  new THREE.Color( "rgb(255,255,255)"), 
-                  new THREE.Color( "rgb(255,255,255)" ), 
-                    new THREE.Color( "rgb(255,255,255)" ), 
-                      new THREE.Color( "rgb(255,255,255)" ),
-          ]),
-    []
-  )
-
   return (
     <React.Fragment>
       <orbitControls
@@ -124,12 +110,12 @@ const WebglGeometryConvex = () => {
             args={[
               {
                color: 0xffffff,
-               opacity: 0.5,
-                //transparent: true,
+               opacity: .5,
+                transparent: true,
               },
             ]}
             side={THREE.BackSide}
-            vertexColors={vertexColor}
+            vertexColors={true}
           />
         </mesh>
         <mesh ref={meshFrontRef} rednderOrder={1}>
@@ -138,12 +124,12 @@ const WebglGeometryConvex = () => {
             args={[
               {
                 color: 0xffffff,
-                opacity: 0.5,
-               // transparent: true,
+                opacity: .5,
+               transparent: true,
               },
             ]}
             side={THREE.FrontSide}
-            vertexColors={vertexColor}
+            vertexColors={true}
           />
         </mesh>
       </group>

@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
+import * as THREE from 'three'
 import { extend, useThree, useLoader } from '@react-three/fiber'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { TextureLoader } from 'three/src/loaders/TextureLoader'
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry'
-import * as THREE from 'three'
-import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils'
-import forEachTriangle from 'three-triangle-iterator';
-import {generateRandomColors} from './Common/ColorUtils'
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
+import forEachTriangle from 'three-triangle-iterator'
+import { generateRandomColors } from './ColorUtils'
 
 extend({ OrbitControls, ConvexGeometry })
 
@@ -47,37 +47,38 @@ const WebglGeometryConvex = () => {
     const geometry = mesh.geometry
     if (!geometry) return
     if (geometry instanceof THREE.BufferGeometry) {
-      if(name==='color'){
-        const rgb =[];
-        value.forEach((v)=>{
-          rgb.push(v[0],v[1],v[2])
+      if (name === 'color') {
+        const rgb = []
+        value.forEach((v) => {
+          rgb.push(v[0], v[1], v[2])
         })
-        value=rgb
+        value = rgb
       }
       geometry.setAttribute(name, new THREE.Float32BufferAttribute(value, itemSize))
     }
   }
   useEffect(() => {
     if (meshFrontRef.current) {
-      const colors=[];
+      const colors = []
       forEachTriangle(meshFrontRef.current, (triangle) => {
         triangle.forEach((vertex) => {
-        colors.push(generateRandomColors())
+          colors.push(generateRandomColors())
         })
       })
       setAttribute(meshFrontRef.current, 'color', colors, 3)
     }
     if (meshBackRef.current) {
-      let colors=[]
+      let colors = []
 
       forEachTriangle(meshBackRef.current, (triangle) => {
         triangle.forEach((vertex) => {
-            colors.push(generateRandomColors())
+          colors.push(generateRandomColors())
         })
       })
       setAttribute(meshBackRef.current, 'color', colors, 3)
     }
   }, [])
+
   return (
     <React.Fragment>
       <orbitControls
@@ -108,13 +109,13 @@ const WebglGeometryConvex = () => {
           <meshLambertMaterial
             args={[
               {
-               color: 0xffffff,
-               opacity: 0.5,
-                //transparent: true,
+                color: 0xffffff,
+                opacity: 0.5,
+                transparent: true,
               },
             ]}
             side={THREE.BackSide}
-            vertexColors={THREE.VertexColors}
+            vertexColors={true}
           />
         </mesh>
         <mesh ref={meshFrontRef} rednderOrder={1}>
@@ -124,11 +125,11 @@ const WebglGeometryConvex = () => {
               {
                 color: 0xffffff,
                 opacity: 0.5,
-               // transparent: true,
+                transparent: true,
               },
             ]}
             side={THREE.FrontSide}
-            vertexColors={THREE.VertexColors}
+            vertexColors={true}
           />
         </mesh>
       </group>

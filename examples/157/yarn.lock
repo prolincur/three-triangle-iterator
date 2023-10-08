@@ -10522,10 +10522,10 @@ three-triangle-iterator@^4.2.0:
   resolved "https://registry.yarnpkg.com/three-triangle-iterator/-/three-triangle-iterator-4.2.0.tgz#707315c2e603f05e6ff788fe6c8c2ca5a474a523"
   integrity sha512-OI9AKVRC/J/XA9N4KsAzzD0vL7uwhAte3bwXqqLbPBU4hWQz1hbFn91CHppT+oq/lAEW1S3WTR4fLG7HkXItHA==
 
-three@^0.129.0:
-  version "0.129.0"
-  resolved "https://registry.yarnpkg.com/three/-/three-0.129.0.tgz#f5e530bbc96eac5d5b4749cb5da886ef0d42f554"
-  integrity sha512-wiWio1yVRg2Oj6WEWsTHQo5eSzYpEwSBtPSi3OofNpvFbf26HFfb9kw4FZJNjII4qxzp0b1xLB11+tKkBGB1ZA==
+three@^0.157.0:
+  version "0.157.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.157.0.tgz#5baac531941fc8c4ca62d45ee4265652e03318d0"
+  integrity sha512-CeAwQrf4x3z0/e+MC4F+nXLW5t0gh3pw+L6CCBqpHvOq3bGYIgRYub7Pv0j/9wR+d++OiEglyZzWyuSYbwWGOA==
 
 throat@^5.0.0:
   version "5.0.0"

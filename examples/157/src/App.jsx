@@ -1,7 +1,8 @@
 import React from 'react'
-import { WebglGeometryConvex } from './WebglGeometryConvex'
 import { Canvas } from '@react-three/fiber'
+import { WebglGeometryConvex } from './WebglGeometryConvex'
 import './App.css'
+
 function App() {
   const style = {
     width: '100%',

@@ -5,7 +5,7 @@ import { TextureLoader } from 'three/src/loaders/TextureLoader'
 import { ConvexBufferGeometry } from 'three/examples/jsm/geometries/ConvexGeometry'
 import * as THREE from 'three'
 import forEachTriangle from 'three-triangle-iterator'
-import { generateRandomColors } from './Common/ColorUtils'
+import { generateRandomColors } from './ColorUtils'
 
 extend({ OrbitControls, ConvexBufferGeometry })
 
@@ -32,18 +32,18 @@ const WebglConvexGeometry = () => {
     if (!geometry) return
     if (geometry instanceof THREE.Geometry) {
       if (name === 'color') {
-        geometry.colors = value;
-        geometry.colorsNeedUpdate=true
+        geometry.colors = value
+        geometry.colorsNeedUpdate = true
       } else {
         throw new Error('unsupported attribute')
       }
     } else if (geometry instanceof THREE.BufferGeometry) {
-      if(name==='color'){
-        const rgb =[];
-        value.forEach((v)=>{
-          rgb.push(v[0],v[1],v[2])
+      if (name === 'color') {
+        const rgb = []
+        value.forEach((v) => {
+          rgb.push(v[0], v[1], v[2])
         })
-        value=rgb
+        value = rgb
       }
       geometry.setAttribute(name, new THREE.Float32BufferAttribute(value, itemSize))
     }
@@ -59,7 +59,7 @@ const WebglConvexGeometry = () => {
       const colors = []
       forEachTriangle(meshFrontRef.current, (triangle) => {
         triangle.forEach((vertex) => {
-          colors.push(generateRandomColors());
+          colors.push(generateRandomColors())
         })
       })
       setAttribute(meshFrontRef.current, 'color', colors, 3)
@@ -68,7 +68,7 @@ const WebglConvexGeometry = () => {
       const colors = []
       forEachTriangle(meshBackRef.current, (triangle) => {
         triangle.forEach((vertex) => {
-          colors.push(generateRandomColors());
+          colors.push(generateRandomColors())
         })
       })
       setAttribute(meshBackRef.current, 'color', colors, 3)

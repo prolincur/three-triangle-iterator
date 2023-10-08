@@ -14,9 +14,7 @@
     "url": "https://github.com/prolincur/three-triangle-iterator/issues"
   },
   "homepage": "https://github.com/prolincur/three-triangle-iterator",
-  "author": {
-    "name": "Sourabh Soni"
-  },
+  "author": "Prolincur Technologies <https://www.prolincur.com>",
   "license": "MIT",
   "private": false,
   "keywords": [
@@ -28,7 +26,9 @@
     "iterator",
     "triangles",
     "face",
-    "cross-platform"
+    "cross-platform",
+    "r3f",
+    "react-three-fiber"
   ],
   "babel": {
     "plugins": [
@@ -53,11 +53,10 @@
   },
   "scripts": {
     "build": "./node_modules/.bin/babel src --out-dir lib",
-    "prettier": "prettier src/**/*.{js,jsx} --write",
-    "lint": "eslint --fix --ext .js,.jsx src"
+    "prettier": "prettier src/*.js --write"
   },
   "peerDependencies": {
-    "three": ">= 0.148.0 <= 0.157.0"
+    "three": ">= 0.123.0 <= 0.157.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.0",
@@ -65,7 +64,6 @@
     "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/preset-env": "^7.13.9",
     "babel-preset-minify": "^0.5.1",
-    "eslint": "^7.28.0",
-    "prettier": "^2.2.1"
+    "prettier": "^3.0.3"
   }
 }

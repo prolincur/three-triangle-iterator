@@ -1,5 +1,5 @@
 {
-  "name": "129",
+  "name": "157",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -21,7 +21,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint --fix --ext .js,.jsx src",
-    "prettier": "prettier src/**/*.js --write"
+    "prettier": "prettier src/*.{js,jsx} --write"
   },
   "eslintConfig": {
     "extends": [

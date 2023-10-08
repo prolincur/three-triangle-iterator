@@ -2,18 +2,18 @@ import React, { useEffect } from 'react'
 import { extend, useThree, useLoader } from '@react-three/fiber'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { TextureLoader } from 'three/src/loaders/TextureLoader'
-import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry'
+import { ConvexBufferGeometry } from 'three/examples/jsm/geometries/ConvexGeometry'
 import * as THREE from 'three'
-import * as  BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
-import forEachTriangle from 'three-triangle-iterator';
-import {generateRandomColors} from './Common/ColorUtils'
+import forEachTriangle from 'three-triangle-iterator'
+import { generateRandomColors } from './ColorUtils'
 
-extend({ OrbitControls, ConvexGeometry })
+extend({ OrbitControls, ConvexBufferGeometry })
 
-const WebglGeometryConvex = () => {
+const WebglConvexGeometry = () => {
   const pointsRef = React.useRef()
   const meshFrontRef = React.useRef()
   const meshBackRef = React.useRef()
+
   const {
     camera,
     gl: { domElement },
@@ -22,63 +22,58 @@ const WebglGeometryConvex = () => {
     'https://cdn.rawgit.com/mrdoob/three.js/r129/examples/textures/sprites/disc.png',
   ])
   const vertices = React.useMemo(() => {
-    const vertices = []
-    let dodecahedronGeometry = new THREE.DodecahedronGeometry(10)
-    const positionAttribute = dodecahedronGeometry.getAttribute('position')
-    dodecahedronGeometry.deleteAttribute('normal')
-    dodecahedronGeometry.deleteAttribute('uv')
-    dodecahedronGeometry = BufferGeometryUtils.mergeVertices(dodecahedronGeometry)
-    for (let i = 0; i < positionAttribute.count; i++) {
-      const vertex = new THREE.Vector3()
-      vertex.fromBufferAttribute(positionAttribute, i)
-      vertices.push(vertex)
-    }
+    const vertices = new THREE.DodecahedronGeometry(10).vertices
     return vertices
   }, [])
-
-  React.useEffect(() => {
-    if (pointsRef.current) {
-      pointsRef.current.setFromPoints(vertices)
-    }
-  }, [vertices])
   const setAttribute = (mesh, name, value, itemSize) => {
     if (!mesh) return
     if (!Array.isArray(value)) return
     const geometry = mesh.geometry
     if (!geometry) return
-    if (geometry instanceof THREE.BufferGeometry) {
-      if(name==='color'){
-        const rgb =[];
-        value.forEach((v)=>{
-          rgb.push(v[0],v[1],v[2])
+    if (geometry instanceof THREE.Geometry) {
+      if (name === 'color') {
+        geometry.colors = value
+        geometry.colorsNeedUpdate = true
+      } else {
+        throw new Error('unsupported attribute')
+      }
+    } else if (geometry instanceof THREE.BufferGeometry) {
+      if (name === 'color') {
+        const rgb = []
+        value.forEach((v) => {
+          rgb.push(v[0], v[1], v[2])
         })
-        value=rgb
+        value = rgb
       }
       geometry.setAttribute(name, new THREE.Float32BufferAttribute(value, itemSize))
     }
   }
   useEffect(() => {
+    if (pointsRef.current) {
+      pointsRef.current.setFromPoints(vertices)
+    }
+  }, [vertices])
+
+  useEffect(() => {
     if (meshFrontRef.current) {
-      const colors=[];
+      const colors = []
       forEachTriangle(meshFrontRef.current, (triangle) => {
         triangle.forEach((vertex) => {
-        colors.push(generateRandomColors())
+          colors.push(generateRandomColors())
         })
       })
       setAttribute(meshFrontRef.current, 'color', colors, 3)
     }
     if (meshBackRef.current) {
-      let colors=[]
-
+      const colors = []
       forEachTriangle(meshBackRef.current, (triangle) => {
         triangle.forEach((vertex) => {
-            colors.push(generateRandomColors())
+          colors.push(generateRandomColors())
         })
       })
       setAttribute(meshBackRef.current, 'color', colors, 3)
     }
   }, [])
-
   return (
     <React.Fragment>
       <orbitControls
@@ -92,7 +87,6 @@ const WebglGeometryConvex = () => {
       <axesHelper args={[20]} />
       <group>
         <points>
-          <bufferGeometry ref={pointsRef} />
           <pointsMaterial
             args={[
               {
@@ -103,37 +97,39 @@ const WebglGeometryConvex = () => {
               },
             ]}
           />
+          <bufferGeometry ref={pointsRef} />
         </points>
-        <mesh ref={meshBackRef} renderOrder={0}>
-          <convexGeometry args={[vertices]} />
+
+        <mesh ref={meshFrontRef} renderOrder={0}>
+          <convexBufferGeometry args={[vertices]} />
           <meshLambertMaterial
             args={[
               {
-               color: 0xffffff,
-               opacity: .5,
+                //color: 0xffffff,
+                opacity: 0.5,
                 transparent: true,
               },
             ]}
             side={THREE.BackSide}
-            vertexColors={true}
+            vertextColors={THREE.VertexColors}
           />
         </mesh>
-        <mesh ref={meshFrontRef} rednderOrder={1}>
-          <convexGeometry args={[vertices]} />
+        <mesh ref={meshBackRef} rednderOrder={1}>
+          <convexBufferGeometry args={[vertices]} />
           <meshLambertMaterial
             args={[
               {
-                color: 0xffffff,
-                opacity: .5,
-               transparent: true,
+                //color: 0xffffff,
+                opacity: 0.5,
+                transparent: true,
               },
             ]}
             side={THREE.FrontSide}
-            vertexColors={true}
+            vertexColors={THREE.VertexColors}
           />
         </mesh>
       </group>
     </React.Fragment>
   )
 }
-export { WebglGeometryConvex }
+export { WebglConvexGeometry }

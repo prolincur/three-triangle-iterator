@@ -26,10 +26,12 @@ class ThreeTriangleIterator {
   }
 
   iterate = (object) => {
-    const Geometry = _safeGetExport(THREE, 'Geometry')
-    if (Geometry && object instanceof Geometry) {
-      this.fromGeometry(object)
-    } else if (object instanceof THREE.BufferGeometry) {
+    // const Geometry = _safeGetExport(THREE, 'Geometry')
+    // if (Geometry && object instanceof Geometry) {
+    //   this.fromGeometry(object)
+    // } else 
+    
+    if (object instanceof THREE.BufferGeometry) {
       if (object.index !== null) {
         this.fromIndexedBufferGeometry(object)
       } else {

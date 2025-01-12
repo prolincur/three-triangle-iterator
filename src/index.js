@@ -29,15 +29,15 @@ class ThreeTriangleIterator {
     const Geometry = _safeGetExport(THREE, 'Geometry')
     if (Geometry && object instanceof Geometry) {
       this.fromGeometry(object)
-    } else if (object instanceof THREE.BufferGeometry) {
+    } else if (object instanceof THREE.BufferGeometry || object.isBufferGeometry) {
       if (object.index !== null) {
         this.fromIndexedBufferGeometry(object)
       } else {
         this.fromNonIndexedBufferGeometry(object)
       }
-    } else if (object instanceof THREE.Mesh) {
+    } else if (object instanceof THREE.Mesh || object.isMesh) {
       this.fromMesh(object)
-    } else if (object instanceof THREE.Group) {
+    } else if (object instanceof THREE.Group || object.isGroup) {
       const traverse = this.iterate
       object.children?.forEach((obj) => traverse(obj))
     } else {

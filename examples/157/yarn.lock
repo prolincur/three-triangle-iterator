@@ -10517,10 +10517,10 @@ three-stdlib@^2.2.0:
     potpack "^1.0.1"
     zstddec "^0.0.2"
 
-three-triangle-iterator@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/three-triangle-iterator/-/three-triangle-iterator-4.2.0.tgz#707315c2e603f05e6ff788fe6c8c2ca5a474a523"
-  integrity sha512-OI9AKVRC/J/XA9N4KsAzzD0vL7uwhAte3bwXqqLbPBU4hWQz1hbFn91CHppT+oq/lAEW1S3WTR4fLG7HkXItHA==
+three-triangle-iterator@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/three-triangle-iterator/-/three-triangle-iterator-4.5.0.tgz#da10659e1fc9adebf703340abe39ca65f3ccdc43"
+  integrity sha512-Onkl+hqk+yEHDbYXu4mxXJd/GSUkCpxhM4b5qyix5T57F5jK4GazuyTXRJO8oFhqFglG47TR3uCHUxiMCX4HMQ==
 
 three@^0.157.0:
   version "0.157.0"

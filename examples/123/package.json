@@ -1,47 +1,17 @@
 {
-  "name": "123",
-  "version": "0.1.0",
+  "name": "three-triangle-iterator-example-123",
   "private": true,
-  "dependencies": {
-    "@react-three/fiber": "^7.0.1",
-    "@testing-library/jest-dom": "^5.14.1",
-    "@testing-library/react": "^11.2.7",
-    "@testing-library/user-event": "^12.8.3",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
-    "three": "0.123.0",
-    "three-triangle-iterator": "^4.5.0",
-    "web-vitals": "^1.1.2"
-  },
+  "type": "module",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "prettier": "prettier src/*.{js,jsx} --write",
-    "lint": "eslint --fix --ext .js src"
+    "dev": "pnpm --dir ../.. run build && vite",
+    "build": "pnpm --dir ../.. run build && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "0.123.0",
+    "three-triangle-iterator": "workspace:*"
   },
   "devDependencies": {
-    "eslint": "^7.28.0",
-    "prettier": "^2.2.1"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "vite": "^8.3.5"
   }
 }

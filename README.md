@@ -5,6 +5,10 @@
 
 #### Install
 ```
+pnpm add three-triangle-iterator three
+```
+or
+```
 yarn add three-triangle-iterator three
 ```
 or

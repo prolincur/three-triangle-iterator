@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-23 Prolincur Technologies LLP.
+ * Copyright (c) 2020-present Prolincur Technologies LLP.
  * All Rights Reserved.
  */
 
@@ -7,6 +7,7 @@ import * as THREE from 'three'
 
 /**
  * Simple trick to load THREE.Geometry in older and newer versions of three
+ * (THREE.Geometry was removed in r125).
  * @returns
  */
 const _safeGetExport = (three, exp) => {
@@ -16,148 +17,140 @@ const _safeGetExport = (three, exp) => {
 /**
  * An utility to make traversal of triangular faces of {@link three.js} Mesh, Geometry or BufferGeometry easy.
  *
- * @author Sourabh Soni <Sourabh.Soni@prolincur.com>
  */
 class ThreeTriangleIterator {
   constructor(object, forEachFace) {
     this.callback = forEachFace
-    this.matrix = null
+    this.matrix = new THREE.Matrix4()
     if (object) this.iterate(object)
   }
 
   iterate = (object) => {
+    if (!object) return
     const Geometry = _safeGetExport(THREE, 'Geometry')
     if (Geometry && object instanceof Geometry) {
       this.fromGeometry(object)
     } else if (object instanceof THREE.BufferGeometry || object.isBufferGeometry) {
-      if (object.index !== null) {
+      if (object.index !== null && object.index !== undefined) {
         this.fromIndexedBufferGeometry(object)
       } else {
         this.fromNonIndexedBufferGeometry(object)
       }
     } else if (object instanceof THREE.Mesh || object.isMesh) {
       this.fromMesh(object)
-    } else if (object instanceof THREE.Group || object.isGroup) {
-      const traverse = this.iterate
-      object.children?.forEach((obj) => traverse(obj))
+    } else if (object instanceof THREE.Object3D || object.isObject3D) {
+      // Group, Scene, plain Object3D etc.
+      this.fromObject3D(object)
     } else {
       console.warn('three-triangle-iterator - skipping unsupported object type ' + object?.type)
     }
   }
 
-  fromMesh = (mesh) => {
-    const geometry = mesh.geometry
-    mesh.updateMatrix()
-    this.matrix = mesh.matrix.clone()
-    this.iterate(geometry)
+  /**
+   * Runs fn with this.matrix temporarily multiplied by the object's local matrix,
+   * so that transforms of parent containers are accumulated.
+   */
+  _withLocalMatrix = (object, fn) => {
+    const parentMatrix = this.matrix
+    object.updateMatrix()
+    this.matrix = parentMatrix.clone().multiply(object.matrix)
+    try {
+      fn()
+    } finally {
+      this.matrix = parentMatrix
+    }
   }
 
+  _iterateChildren = (object) => {
+    const children = object.children
+    if (!children) return
+    for (let i = 0; i < children.length; i++) this.iterate(children[i])
+  }
+
+  fromObject3D = (object) => {
+    this._withLocalMatrix(object, () => this._iterateChildren(object))
+  }
+
+  fromMesh = (mesh) => {
+    this._withLocalMatrix(mesh, () => {
+      this.iterate(mesh.geometry)
+      this._iterateChildren(mesh)
+    })
+  }
+
+  _vertex = (x, y, z) => new THREE.Vector3(x, y, z).applyMatrix4(this.matrix)
+
   fromGeometry = (geometry) => {
-    if (!this.matrix) this.matrix = THREE.Matrix4()
-
-    const positions = geometry.faces
-    const len = positions.length
+    const vertices = geometry.vertices
+    const faces = geometry.faces
+    const len = faces.length
     for (let i = 0; i < len; i++) {
-      const polygon = []
-      const face = geometry.faces[i]
-      let vertex = geometry.vertices[face.a]
-      vertex = new THREE.Vector3(vertex.x, vertex.y, vertex.z)
-      vertex.applyMatrix4(this.matrix)
-      polygon.push(vertex)
-
-      vertex = geometry.vertices[face.b]
-      vertex = new THREE.Vector3(vertex.x, vertex.y, vertex.z)
-      vertex.applyMatrix4(this.matrix)
-      polygon.push(vertex)
-
-      vertex = geometry.vertices[face.c]
-      vertex = new THREE.Vector3(vertex.x, vertex.y, vertex.z)
-      vertex.applyMatrix4(this.matrix)
-      polygon.push(vertex)
-
-      this.callback(polygon)
+      const face = faces[i]
+      const a = vertices[face.a]
+      const b = vertices[face.b]
+      const c = vertices[face.c]
+      this.callback([
+        this._vertex(a.x, a.y, a.z),
+        this._vertex(b.x, b.y, b.z),
+        this._vertex(c.x, c.y, c.z),
+      ])
     }
+  }
+
+  // getX/getY/getZ handle both BufferAttribute and InterleavedBufferAttribute
+  _vertexAt = (position, i) => this._vertex(position.getX(i), position.getY(i), position.getZ(i))
+
+  /**
+   * Returns the [start, end) element range to visit, honouring geometry.drawRange.
+   */
+  _range = (geometry, count) => {
+    const drawRange = geometry.drawRange
+    if (!drawRange) return [0, count]
+    const start = Math.max(0, drawRange.start || 0)
+    const end = Math.min(count, start + drawRange.count) // drawRange.count defaults to Infinity
+    return [start, end]
   }
 
   fromNonIndexedBufferGeometry = (geometry) => {
-    if (!this.matrix) this.matrix = new THREE.Matrix4()
-    const positions = geometry.attributes.position.array
-    const len = positions.length
-    if (len % 9 !== 0) {
+    const position = geometry.attributes?.position
+    if (!position) return
+    const count = position.count
+    if (count % 3 !== 0) {
       console.warn(
-        'three-triangle-iterator - skipping unsupported non-indexed buffer geometry of length ' +
-          len
+        'three-triangle-iterator - skipping unsupported non-indexed buffer geometry with vertex count ' +
+          count
       )
       return
     }
-    let i = -1
-    let x, y, z, vertex
-    while (i < len - 1) {
-      const polygon = []
-
-      x = positions[++i]
-      y = positions[++i]
-      z = positions[++i]
-      vertex = new THREE.Vector3(x, y, z)
-      vertex.applyMatrix4(this.matrix)
-      polygon.push(vertex)
-
-      x = positions[++i]
-      y = positions[++i]
-      z = positions[++i]
-      vertex = new THREE.Vector3(x, y, z)
-      vertex.applyMatrix4(this.matrix)
-      polygon.push(vertex)
-
-      x = positions[++i]
-      y = positions[++i]
-      z = positions[++i]
-      vertex = new THREE.Vector3(x, y, z)
-      vertex.applyMatrix4(this.matrix)
-      polygon.push(vertex)
-
-      this.callback(polygon)
+    const [start, end] = this._range(geometry, count)
+    for (let i = start; i + 2 < end; i += 3) {
+      this.callback([
+        this._vertexAt(position, i),
+        this._vertexAt(position, i + 1),
+        this._vertexAt(position, i + 2),
+      ])
     }
   }
 
   fromIndexedBufferGeometry = (geometry) => {
-    if (!this.matrix) this.matrix = THREE.Matrix4()
-    const positions = geometry.attributes.position.array
-    const indices = geometry.index.array
-    const len = indices.length
-
-    for (let i = 0; i < len; i += 3) {
-      const polygon = []
-
-      let index3 = indices[i] * 3
-      let vertex = new THREE.Vector3(
-        positions[index3],
-        positions[index3 + 1],
-        positions[index3 + 2]
-      )
-      vertex.applyMatrix4(this.matrix)
-      polygon.push(vertex)
-
-      index3 = indices[i + 1] * 3
-      vertex = new THREE.Vector3(positions[index3], positions[index3 + 1], positions[index3 + 2])
-      vertex.applyMatrix4(this.matrix)
-      polygon.push(vertex)
-
-      index3 = indices[i + 2] * 3
-      vertex = new THREE.Vector3(positions[index3], positions[index3 + 1], positions[index3 + 2])
-      vertex.applyMatrix4(this.matrix)
-      polygon.push(vertex)
-
-      this.callback(polygon)
+    const position = geometry.attributes?.position
+    if (!position) return
+    const index = geometry.index
+    const [start, end] = this._range(geometry, index.count)
+    for (let i = start; i + 2 < end; i += 3) {
+      this.callback([
+        this._vertexAt(position, index.getX(i)),
+        this._vertexAt(position, index.getX(i + 1)),
+        this._vertexAt(position, index.getX(i + 2)),
+      ])
     }
   }
 }
 
 /**
  * Iterates each geometry face of the object.
- * @param {object} object ThreeJS Mesh, Geometry, or BufferGeometry
+ * @param {object} object ThreeJS Object3D (Mesh, Group, Scene...), Geometry, or BufferGeometry
  * @param {function} callback Callback function to visit each face
- * @author Sourabh Soni <Sourabh.Soni@prolincur.com>
  */
 const forEachTriangle = (object, callback) => {
   return new ThreeTriangleIterator(object, callback)

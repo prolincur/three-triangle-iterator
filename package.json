@@ -3,8 +3,9 @@
   "version": "4.5.0",
   "description": "Makes it easy to traverse triangles of three.js's Mesh, Group, BufferGeometry and Geometry object(s).",
   "main": "lib/index.js",
+  "module": "lib/esm/index.js",
   "files": [
-    "lib/*"
+    "lib/**/*"
   ],
   "repository": {
     "type": "git",
@@ -30,40 +31,26 @@
     "r3f",
     "react-three-fiber"
   ],
-  "babel": {
-    "plugins": [
-      "@babel/plugin-proposal-class-properties"
-    ],
-    "presets": [
-      [
-        "@babel/env",
-        {
-          "targets": {
-            "edge": "17",
-            "firefox": "60",
-            "chrome": "67",
-            "safari": "11.1"
-          },
-          "useBuiltIns": "usage",
-          "corejs": "3.6.5"
-        }
-      ],
-      "minify"
-    ]
-  },
   "scripts": {
-    "build": "./node_modules/.bin/babel src --out-dir lib",
-    "prettier": "prettier src/*.js --write"
+    "build": "babel src --out-dir lib && BABEL_ENV=esm babel src --out-dir lib/esm",
+    "test": "jest",
+    "prettier": "prettier src/*.js test/*.js --write"
   },
   "peerDependencies": {
-    "three": ">= 0.123.0 <= 0.157.0"
+    "three": ">= 0.123.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.0",
     "@babel/core": "^7.13.8",
     "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/preset-env": "^7.13.9",
+    "babel-jest": "^29.7.0",
     "babel-preset-minify": "^0.5.1",
-    "prettier": "^3.0.3"
-  }
+    "jest": "^29.7.0",
+    "prettier": "^3.0.3",
+    "three": "^0.187.0",
+    "three-r123": "npm:three@0.123.0",
+    "three-r157": "npm:three@0.157.0"
+  },
+  "packageManager": "pnpm@10.34.5"
 }

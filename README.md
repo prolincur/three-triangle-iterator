@@ -66,6 +66,18 @@ Triangles are selected the same way three.js' `WebGLRenderer` draws them:
 - **Legacy `THREE.Geometry`** (before r125): `materialIndex` is the face's `materialIndex`; with an
   array of materials, faces whose `materialIndex` has no material are skipped.
 
+### Examples
+
+[examples/](examples) holds one demo ([examples/shared/main.js](examples/shared/main.js)) that runs on
+several three.js versions. Each folder pins a version and uses the local library through the
+pnpm workspace:
+
+```
+pnpm install
+pnpm --dir examples/123 dev   # three r123
+pnpm --dir examples/157 dev   # three r157
+```
+
 ### Author
 
 [Prolincur Technologies](https://prolincur.com)

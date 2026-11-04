@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2020-present Prolincur Technologies LLP.
+ * All Rights Reserved.
+ */
+
 /**
  * Runs the same test suite against several three.js versions.
  * Each project maps `three` to an npm-aliased install (see devDependencies).

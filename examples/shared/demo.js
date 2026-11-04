@@ -1,4 +1,9 @@
 /*
+ * Copyright (c) 2020-present Prolincur Technologies LLP.
+ * All Rights Reserved.
+ */
+
+/*
  * Example: rebuild a scene from the triangles reported by three-triangle-iterator.
  *
  * A hidden group of transformed meshes is iterated with forEachTriangle. Every triangle

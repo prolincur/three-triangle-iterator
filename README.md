@@ -68,7 +68,7 @@ Triangles are selected the same way three.js' `WebGLRenderer` draws them:
 
 ### Examples
 
-[examples/](examples) holds one demo ([examples/shared/demo.js](examples/shared/main.js)) that runs on
+[examples/](examples) holds one demo ([examples/shared/demo.js](examples/shared/demo.js)) that runs on
 several three.js versions. Each folder pins a version and uses the local library through the
 pnpm workspace:
 
@@ -81,4 +81,10 @@ pnpm --dir examples/157 dev   # three r157
 ### Author
 
 [Prolincur Technologies](https://prolincur.com)
+
+### License
+
+Copyright (c) 2020-present Prolincur Technologies LLP.
+
+Released under the [MIT License](LICENSE).
 

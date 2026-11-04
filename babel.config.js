@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2020-present Prolincur Technologies LLP.
+ * All Rights Reserved.
+ */
+
 module.exports = (api) => {
   const env = api.env()
   const isTest = env === 'test'

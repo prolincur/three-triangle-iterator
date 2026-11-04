@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm --dir ../.. run build && vite --config ../shared/vite.config.js",
-    "build": "pnpm --dir ../.. run build && vite build --config ../shared/vite.config.js",
-    "preview": "vite preview --config ../shared/vite.config.js"
+    "dev": "pnpm --dir ../.. run build && vite",
+    "build": "pnpm --dir ../.. run build && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "three": "0.123.0",

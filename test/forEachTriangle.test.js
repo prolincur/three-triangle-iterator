@@ -15,6 +15,26 @@ const collect = (object) => {
   return triangles
 }
 
+const collectInfo = (object) => {
+  const infos = []
+  forEachTriangle(object, (triangle, info) => infos.push(info))
+  return infos
+}
+
+const materialIndices = (object) => collectInfo(object).map((info) => info.materialIndex)
+
+// Non-indexed geometry of `n` triangles, triangle k lying at x = k.
+const strip = (n) => {
+  const positions = []
+  for (let k = 0; k < n; k++) positions.push(k, 0, 0, k, 1, 0, k, 0, 1)
+  const geometry = new THREE.BufferGeometry()
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+  return geometry
+}
+
+// x coordinate identifying each visited triangle of a strip()
+const triangleIds = (object) => collect(object).map((tri) => tri[0].x)
+
 const allVertices = (triangles) => triangles.flat()
 
 const withinBox =
@@ -214,9 +234,190 @@ describe(`three r${THREE.REVISION}`, () => {
     })
   })
 
+  describe('geometry.groups', () => {
+    test('indexed box: triangles reported per group with materialIndex and groupIndex', () => {
+      const geometry = box()
+      expect(geometry.groups).toHaveLength(6)
+      const infos = collectInfo(geometry)
+      expect(infos).toHaveLength(12)
+      expect(infos.map((i) => i.materialIndex)).toEqual([0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5])
+      expect(infos.map((i) => i.groupIndex)).toEqual([0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5])
+    })
+
+    test('non-indexed geometry honours groups', () => {
+      const geometry = strip(4)
+      geometry.addGroup(0, 6, 3)
+      geometry.addGroup(6, 6, 7)
+      expect(triangleIds(geometry)).toEqual([0, 1, 2, 3])
+      expect(materialIndices(geometry)).toEqual([3, 3, 7, 7])
+    })
+
+    test('groups are visited in group order, not buffer order', () => {
+      const geometry = strip(3)
+      geometry.addGroup(6, 3, 2)
+      geometry.addGroup(0, 6, 1)
+      expect(triangleIds(geometry)).toEqual([2, 0, 1])
+      expect(materialIndices(geometry)).toEqual([2, 1, 1])
+    })
+
+    test('triangles outside every group are skipped', () => {
+      const geometry = strip(4)
+      geometry.addGroup(0, 3, 1)
+      geometry.addGroup(9, 3, 2)
+      expect(triangleIds(geometry)).toEqual([0, 3])
+    })
+
+    test('overlapping groups visit shared triangles once per group', () => {
+      const geometry = strip(3)
+      geometry.addGroup(0, 6, 0)
+      geometry.addGroup(3, 6, 1)
+      expect(triangleIds(geometry)).toEqual([0, 1, 1, 2])
+      expect(materialIndices(geometry)).toEqual([0, 0, 1, 1])
+    })
+
+    test('group with count Infinity runs to the end of the geometry', () => {
+      const geometry = strip(4)
+      geometry.addGroup(3, Infinity, 5)
+      expect(triangleIds(geometry)).toEqual([1, 2, 3])
+    })
+
+    test('groups are clipped to drawRange', () => {
+      const geometry = strip(4)
+      geometry.addGroup(0, 6, 0)
+      geometry.addGroup(6, 6, 1)
+      geometry.setDrawRange(3, 6) // triangles 1..2
+      expect(triangleIds(geometry)).toEqual([1, 2])
+      expect(materialIndices(geometry)).toEqual([0, 1])
+    })
+
+    test('indexed geometry with custom groups', () => {
+      const geometry = box() // 12 triangles, 36 indices
+      geometry.clearGroups()
+      geometry.addGroup(30, 6, 9)
+      const infos = collectInfo(geometry)
+      expect(infos).toHaveLength(2)
+      expect(infos.every((i) => i.materialIndex === 9 && i.groupIndex === 0)).toBe(true)
+    })
+
+    test('geometry without groups reports undefined materialIndex and groupIndex', () => {
+      const infos = collectInfo(strip(2))
+      expect(infos).toHaveLength(2)
+      infos.forEach((info) => {
+        expect(info.materialIndex).toBeUndefined()
+        expect(info.groupIndex).toBeUndefined()
+      })
+    })
+
+    test('info objects are frozen', () => {
+      const [info] = collectInfo(box())
+      expect(Object.isFrozen(info)).toBe(true)
+    })
+
+    test('multi-material Mesh reports groups and applies transform', () => {
+      const materials = [0, 1, 2, 3, 4, 5].map(() => new THREE.MeshBasicMaterial())
+      const mesh = new THREE.Mesh(box(), materials)
+      mesh.position.set(0, 0, -30)
+      const triangles = []
+      const infos = []
+      forEachTriangle(mesh, (tri, info) => {
+        triangles.push(tri)
+        infos.push(info)
+      })
+      expect(triangles).toHaveLength(12)
+      expect(allVertices(triangles).every(withinBox(mesh.position))).toBe(true)
+      expect(new Set(infos.map((i) => i.materialIndex))).toEqual(new Set([0, 1, 2, 3, 4, 5]))
+    })
+  })
+
+  describe('geometry.groups on a Mesh (matches three.js WebGLRenderer)', () => {
+    const mat = () => new THREE.MeshBasicMaterial()
+    // strip(4) with a gap (triangle 1) and an overlap (triangle 3 twice)
+    const gappyStrip = () => {
+      const geometry = strip(4)
+      geometry.addGroup(0, 3, 0)
+      geometry.addGroup(6, 6, 1)
+      geometry.addGroup(9, 3, 2)
+      return geometry
+    }
+
+    test('single material: groups ignored, whole drawRange visited once', () => {
+      const mesh = new THREE.Mesh(gappyStrip(), mat())
+      expect(triangleIds(mesh)).toEqual([0, 1, 2, 3])
+      collectInfo(mesh).forEach((info) => {
+        expect(info.materialIndex).toBeUndefined()
+        expect(info.groupIndex).toBeUndefined()
+      })
+    })
+
+    test('single material: drawRange still applies', () => {
+      const geometry = gappyStrip()
+      geometry.setDrawRange(3, 6)
+      expect(triangleIds(new THREE.Mesh(geometry, mat()))).toEqual([1, 2])
+    })
+
+    test('material array: only grouped triangles, gaps skipped, overlaps repeated', () => {
+      const mesh = new THREE.Mesh(gappyStrip(), [mat(), mat(), mat()])
+      expect(triangleIds(mesh)).toEqual([0, 2, 3, 3])
+      expect(materialIndices(mesh)).toEqual([0, 1, 1, 2])
+      expect(collectInfo(mesh).map((i) => i.groupIndex)).toEqual([0, 1, 1, 2])
+    })
+
+    test('material array: groups without a material at materialIndex are skipped', () => {
+      const mesh = new THREE.Mesh(gappyStrip(), [mat(), undefined, mat()])
+      expect(triangleIds(mesh)).toEqual([0, 3])
+      expect(materialIndices(mesh)).toEqual([0, 2])
+    })
+
+    test('material array: geometry without groups visits nothing', () => {
+      expect(collect(new THREE.Mesh(strip(3), [mat()]))).toHaveLength(0)
+    })
+
+    test('material array: groups clipped to drawRange', () => {
+      const geometry = gappyStrip()
+      geometry.setDrawRange(6, 3) // triangle 2 only
+      expect(triangleIds(new THREE.Mesh(geometry, [mat(), mat(), mat()]))).toEqual([2])
+    })
+
+    test('material of a parent mesh does not leak to child or sibling meshes', () => {
+      const parent = new THREE.Mesh(gappyStrip(), [mat(), mat(), mat()])
+      const child = new THREE.Mesh(gappyStrip(), mat())
+      parent.add(child)
+      const group = new THREE.Group()
+      group.add(parent)
+      group.add(new THREE.Mesh(gappyStrip(), mat()))
+      // parent: grouped; child and sibling: single material, all 4 triangles
+      expect(triangleIds(group)).toEqual([0, 2, 3, 3, 0, 1, 2, 3, 0, 1, 2, 3])
+    })
+
+    test('bare geometry passed after a mesh is treated as having no material', () => {
+      const geometry = gappyStrip()
+      forEachTriangle(new THREE.Mesh(geometry, mat()), () => {})
+      expect(triangleIds(geometry)).toEqual([0, 2, 3, 3])
+    })
+  })
+
   const legacy = THREE.Geometry ? describe : describe.skip
   legacy('legacy THREE.Geometry (removed in r125)', () => {
     const legacyBox = () => new THREE.Geometry().fromBufferGeometry(box())
+
+    test('reports each face materialIndex', () => {
+      const infos = collectInfo(legacyBox())
+      expect(new Set(infos.map((i) => i.materialIndex))).toEqual(new Set([0, 1, 2, 3, 4, 5]))
+      infos.forEach((i) => expect(i.groupIndex).toBeUndefined())
+    })
+
+    test('Mesh with single material visits every face', () => {
+      expect(collect(new THREE.Mesh(legacyBox(), new THREE.MeshBasicMaterial()))).toHaveLength(12)
+    })
+
+    test('Mesh with material array skips faces without a material', () => {
+      const materials = [0, 1, 2, 3, 4, 5].map(() => new THREE.MeshBasicMaterial())
+      materials[1] = undefined
+      materials[4] = undefined
+      const infos = collectInfo(new THREE.Mesh(legacyBox(), materials))
+      expect(infos).toHaveLength(8)
+      expect(new Set(infos.map((i) => i.materialIndex))).toEqual(new Set([0, 2, 3, 5]))
+    })
 
     test('Geometry passed directly', () => {
       const triangles = collect(legacyBox())

@@ -42,6 +42,30 @@ forEachTriangle(object, (triangle) => {
 
 ```
 
+#### Geometry groups (multi-material)
+
+The callback also receives an `info` object `{ materialIndex, groupIndex }`.
+
+```javascript
+forEachTriangle(mesh, (triangle, { materialIndex, groupIndex }) => {
+  // materialIndex: index into mesh.material when it is an array
+  // groupIndex: position of the group in geometry.groups
+})
+```
+
+Triangles are selected the same way three.js' `WebGLRenderer` draws them:
+
+- **Mesh with an array of materials**: only triangles inside `geometry.groups` are visited, group
+  by group, each group clipped to `geometry.drawRange`. Triangles outside every group are
+  skipped, triangles in overlapping groups are visited once per group, and groups whose
+  `materialIndex` has no material are skipped. A geometry without groups yields nothing.
+- **Mesh with a single material**: groups are ignored; every triangle in `drawRange` is visited
+  once and both `info` values are `undefined`.
+- **Bare `BufferGeometry`** (no mesh, so no material): groups are used when present, otherwise
+  every triangle in `drawRange` is visited.
+- **Legacy `THREE.Geometry`** (before r125): `materialIndex` is the face's `materialIndex`; with an
+  array of materials, faces whose `materialIndex` has no material are skipped.
+
 ### Author
 
 [Prolincur Technologies](https://prolincur.com)

@@ -1,12 +1,13 @@
 {
   "name": "three-triangle-iterator",
-  "version": "4.5.0",
-  "description": "Makes it easy to traverse triangles of three.js's Mesh, Group, BufferGeometry and Geometry object(s).",
+  "version": "5.0.0",
+  "description": "Iterate over every triangle of a three.js Object3D (Mesh, Group, Scene), BufferGeometry or legacy Geometry, with transforms, drawRange and multi-material groups applied.",
   "main": "lib/index.js",
   "module": "lib/esm/index.js",
   "files": [
     "lib/**/*"
   ],
+  "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/prolincur/three-triangle-iterator"
@@ -17,9 +18,7 @@
   "homepage": "https://github.com/prolincur/three-triangle-iterator",
   "author": "Prolincur Technologies <https://prolincur.com>",
   "license": "MIT",
-  "private": false,
   "keywords": [
-    "triangulation",
     "cad",
     "viewer",
     "three",
@@ -32,9 +31,10 @@
     "react-three-fiber"
   ],
   "scripts": {
-    "build": "babel src --out-dir lib && BABEL_ENV=esm babel src --out-dir lib/esm",
+    "build": "babel src --out-dir lib && babel src --out-dir lib/esm --env-name esm",
     "test": "jest",
-    "prettier": "prettier src/*.js test/*.js --write"
+    "prettier": "prettier src/*.js test/*.js --write",
+    "prepublishOnly": "pnpm test && pnpm run build"
   },
   "peerDependencies": {
     "three": ">= 0.123.0"
@@ -42,7 +42,6 @@
   "devDependencies": {
     "@babel/cli": "^7.13.0",
     "@babel/core": "^7.13.8",
-    "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/preset-env": "^7.13.9",
     "babel-jest": "^29.7.0",
     "babel-preset-minify": "^0.5.1",
